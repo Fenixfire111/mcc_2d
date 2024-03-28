@@ -1,0 +1,9 @@
+D:/04_Programming/03_Experiments/10_MinecraftC/mcc_2d/mcc_2d_qt/build-mcc_2d_qt-Desktop_Qt_6_6_2_MinGW_64_bit-Debug/CMakeFiles/mcc_2d_qt.dir
+D:/04_Programming/03_Experiments/10_MinecraftC/mcc_2d/mcc_2d_qt/build-mcc_2d_qt-Desktop_Qt_6_6_2_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
+D:/04_Programming/03_Experiments/10_MinecraftC/mcc_2d/mcc_2d_qt/build-mcc_2d_qt-Desktop_Qt_6_6_2_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
+D:/04_Programming/03_Experiments/10_MinecraftC/mcc_2d/mcc_2d_qt/build-mcc_2d_qt-Desktop_Qt_6_6_2_MinGW_64_bit-Debug/CMakeFiles/list_install_components.dir
+D:/04_Programming/03_Experiments/10_MinecraftC/mcc_2d/mcc_2d_qt/build-mcc_2d_qt-Desktop_Qt_6_6_2_MinGW_64_bit-Debug/CMakeFiles/install.dir
+D:/04_Programming/03_Experiments/10_MinecraftC/mcc_2d/mcc_2d_qt/build-mcc_2d_qt-Desktop_Qt_6_6_2_MinGW_64_bit-Debug/CMakeFiles/install/local.dir
+D:/04_Programming/03_Experiments/10_MinecraftC/mcc_2d/mcc_2d_qt/build-mcc_2d_qt-Desktop_Qt_6_6_2_MinGW_64_bit-Debug/CMakeFiles/install/strip.dir
+D:/04_Programming/03_Experiments/10_MinecraftC/mcc_2d/mcc_2d_qt/build-mcc_2d_qt-Desktop_Qt_6_6_2_MinGW_64_bit-Debug/CMakeFiles/mcc_2d_qt_autogen_timestamp_deps.dir
+D:/04_Programming/03_Experiments/10_MinecraftC/mcc_2d/mcc_2d_qt/build-mcc_2d_qt-Desktop_Qt_6_6_2_MinGW_64_bit-Debug/CMakeFiles/mcc_2d_qt_autogen.dir
