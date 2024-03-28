@@ -15,6 +15,7 @@ public:
     QRect getRect();
     void setRect(QRect);
     QImage & getImage();
+    void move(int);
 
 private:
     QImage image;

@@ -3,8 +3,9 @@
 #include <QWidget>
 #include <QKeyEvent>
 #include "block.h"
-#include"human.h"
-#include<vector>
+#include "human.h"
+#include <vector>
+#include <memory>
 
 class Game : public QWidget {
 
@@ -23,15 +24,19 @@ protected:
     void moveObjects();
     void checkCollision();
     bool checkСoordinates(int,int);
-    std::pair<int, int> convertPixelsToCoordinates(int,int);
+    std::pair<int, int> convertPixelsToCoordinates(int xp, int yp, bool enableCorrections = true);
+    void moveWorld();
 
 private:
+    int worldDx;
     int timerId;
-    static const int N_OF_BLOCKS = 300;
+    int correctionX;
+    static const int N_OF_BLOCKS = 1500;
     static const int ROWS_OF_BLOCKS = 15;
-    static const int COLUMNS_OF_BLOCKS = 20;
+    static const int COLUMNS_OF_BLOCKS = 100;
     static const int DELAY = 10;
 
-    std::vector<Block> blocks;
-    Human* human;
+    // std::vector<Block> blocks;
+    std::vector<std::vector<Block>> blocks;
+    std::unique_ptr<Human> human;
 };

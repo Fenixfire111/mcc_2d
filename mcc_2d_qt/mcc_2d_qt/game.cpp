@@ -1,30 +1,28 @@
 #include <QPainter>
 #include <QApplication>
 #include "game.h"
+#include <iostream>
 
-Game::Game(QWidget *parent)
-    : QWidget(parent) {
-
-    int k = 0;
-
+Game::Game(QWidget *parent) : QWidget(parent), blocks(ROWS_OF_BLOCKS) {
     for (int i = 0; i < ROWS_OF_BLOCKS; i++) {
         for (int j = 0; j < COLUMNS_OF_BLOCKS; j++) {
             Block block(j*50, i*50);
-            if (i < 12) {
+            if (i < 12) { //cost
                 block.setDestroyed(true);
             }
-            blocks.push_back(block);
-            k++;
+            blocks[i].push_back(block);
         }
     }
 
-    human = new Human;
+    human = std::make_unique<Human>();
 
+    worldDx = 0;
+    correctionX = 0;
     timerId = startTimer(DELAY);
 }
 
 Game::~Game() {
-    delete human;
+
 }
 
 void Game::paintEvent(QPaintEvent *e) {
@@ -38,9 +36,11 @@ void Game::paintEvent(QPaintEvent *e) {
 
 void Game::drawObjects(QPainter *painter) {
 
-    for (int i=0; i<N_OF_BLOCKS; i++) {
-        if (!blocks[i].isDestroyed()) {
-            painter->drawImage(blocks[i].getRect(), blocks[i].getImage());
+    for (int i = 0; i < ROWS_OF_BLOCKS; i++) {
+        for (int j = 0; j < COLUMNS_OF_BLOCKS; j++) {
+            if (!blocks[i][j].isDestroyed()) {
+                painter->drawImage(blocks[i][j].getRect(), blocks[i][j].getImage());
+            }
         }
     }
 
@@ -49,6 +49,7 @@ void Game::drawObjects(QPainter *painter) {
 
 void Game::moveObjects() {
     human->move();
+    moveWorld();
 }
 
 void Game::timerEvent(QTimerEvent *event) {
@@ -75,11 +76,11 @@ void Game::mousePressEvent(QMouseEvent *event) {
 
     if (checkСoordinates(xB, yB)) {
         if (event->button() == Qt::LeftButton) {
-            blocks[yB*20 + xB].setDestroyed(true);
+            blocks[yB][xB].setDestroyed(true);
         } else if (event->button() == Qt::RightButton &&
                    !(xB ==xH1 && yB == yH1) && !(xB ==xH2 && yB == yH2) &&
-                   !(xB ==xH3 && yB == yH3) && !(xB ==xH4 && yB == yH4)) {
-            blocks[yB*20 + xB].setDestroyed(false);
+                   !(xB ==xH3 && yB == yH3) && !(xB ==xH4 && yB == yH4)){
+            blocks[yB][xB].setDestroyed(false);
         }
     }
 }
@@ -89,13 +90,21 @@ void Game::keyPressEvent(QKeyEvent *event) {
     int dx = 0;
     int dy = 0;
 
-    if (event->key() == Qt::Key_Left) {
-        dx = -1;
-        human->setDx(dx);
-    }else if (event->key() == Qt::Key_Right) {
-        dx = 1;
-        human->setDx(dx);
-    }else if (event->key() == Qt::Key_Space) {
+    if (event->key() == Qt::Key_Left || event->key() == Qt::Key_A) {
+        if (human->getRect().left() < 350) {
+            worldDx = 1;
+        } else {
+            dx = -1;
+            human->setDx(dx);
+        }
+    }else if (event->key() == Qt::Key_Right || event->key() == Qt::Key_D) {
+        if (human->getRect().right() > 700) {
+            worldDx = -1;
+        } else {
+            dx = 1;
+            human->setDx(dx);
+        }
+    }else if (event->key() == Qt::Key_Space || event->key() == Qt::Key_W) {
         dy = -1;
         human->setDy(dy);
         if (human->jump < 1 && human->stand) {
@@ -110,20 +119,17 @@ void Game::keyPressEvent(QKeyEvent *event) {
     }
 }
 
-void Game::keyReleaseEvent(QKeyEvent *e) {
-
+void Game::keyReleaseEvent(QKeyEvent *event) {
     int dx = 0;
 
-    switch (e->key()) {
-    case Qt::Key_Left:
+    if (event->key() == Qt::Key_Left || event->key() == Qt::Key_A) {
         dx = 0;
         human->setDx(dx);
-        break;
-
-    case Qt::Key_Right:
+        worldDx = 0;
+    }else if (event->key() == Qt::Key_Right || event->key() == Qt::Key_D) {
         dx = 0;
         human->setDx(dx);
-        break;
+        worldDx = 0;
     }
 }
 
@@ -139,31 +145,34 @@ void Game::checkCollision() {
     QPoint pointLeftBottom(humanLeft + 11, humanTop + humanHeight - 1);
     QPoint pointRightBottom(humanLeft + humanWidth - 12, humanTop + humanHeight - 1);
 
-    for (int i=0; i<N_OF_BLOCKS; i++) {
-        if (!blocks[i].isDestroyed()) {
-            if(blocks[i].getRect().contains(pointRightTop) && human->getDx() > 0) {
-                human->setDx(0);
-            }
+    auto [xBL1, yBL1] = convertPixelsToCoordinates(pointLeftTop.x(), pointLeftTop.y());
+    auto [xBL2, yBL2] = convertPixelsToCoordinates(pointLeftBottom.x(), pointLeftBottom.y());
 
-            if(blocks[i].getRect().contains(pointRightBottom) && human->getDx() > 0) {
-                human->setDx(0); // pizda
-            }
-
-            if(blocks[i].getRect().contains(pointLeftBottom) && human->getDx() < 0) {
-                human->setDx(0);
-            }
-
-            if(blocks[i].getRect().contains(pointLeftTop) && human->getDx() < 0) {
-                human->setDx(0);
-            }
+    if (checkСoordinates(xBL1, yBL1) && checkСoordinates(xBL2, yBL2)) {
+        if((!(blocks[yBL1][xBL1].isDestroyed()) || !(blocks[yBL2][xBL2].isDestroyed()))
+            && (human->getDx() < 0 || worldDx > 0)) {
+            human->setDx(0);
+            worldDx = 0;
         }
-    } // перебор массива
+    }
+
+    auto [xBL3, yBL3] = convertPixelsToCoordinates(pointRightTop.x(), pointRightTop.y());
+    auto [xBL4, yBL4] = convertPixelsToCoordinates(pointRightBottom.x(), pointRightBottom.y());
+
+    if (checkСoordinates(xBL3, yBL3) && checkСoordinates(xBL4, yBL4)) {
+        if((!(blocks[yBL3][xBL3].isDestroyed()) || !(blocks[yBL4][xBL4].isDestroyed()))
+            && (human->getDx() > 0 || worldDx < 0)) {
+            human->setDx(0);
+            worldDx = 0;
+        }
+    }
+
 
     auto [xB3, yB3] = convertPixelsToCoordinates(pointLeftTop.x() + 1, pointLeftTop.y() - 1); //шире
     auto [xB4, yB4] = convertPixelsToCoordinates(pointRightTop.x() - 1, pointRightTop.y() - 1);
 
     if (checkСoordinates(xB3, yB3) && checkСoordinates(xB4, yB4)) {
-        if(!(blocks[yB3*20 + xB3].isDestroyed()) || !(blocks[yB4*20 + xB4].isDestroyed())) {
+        if(!(blocks[yB3][xB3].isDestroyed()) || !(blocks[yB4][xB4].isDestroyed())) {
             human->setDy(0);
             human->jump = 0;
         }
@@ -174,11 +183,11 @@ void Game::checkCollision() {
 
     if (human->jump < 1) {
         if (checkСoordinates(xB1, yB1) && checkСoordinates(xB2, yB2)) {
-            if(blocks[yB1*20 + xB1].isDestroyed() && blocks[yB2*20 + xB2].isDestroyed()) {
+            if(blocks[yB1][xB1].isDestroyed() && blocks[yB2][xB2].isDestroyed()) {
                 human->setDy(1);
             }
 
-            if(!(blocks[yB1*20 + xB1].isDestroyed()) || !(blocks[yB2*20 + xB2].isDestroyed())) {
+            if(!(blocks[yB1][xB1].isDestroyed()) || !(blocks[yB2][xB2].isDestroyed())) {
                 human->setDy(0);
                 human->stand = true;
             }
@@ -187,11 +196,22 @@ void Game::checkCollision() {
 }
 
 bool Game::checkСoordinates(int x,int y) {
-    return (x >= 0 && x < 20 && y >= 0 && y < 15);
+    return (x >= 0 && x < COLUMNS_OF_BLOCKS && y >= 0 && y < ROWS_OF_BLOCKS);
 }
 
-std::pair<int, int> Game::convertPixelsToCoordinates(int xp,int yp) {
-    int x = xp / 50;
-    int y = yp / 50;
-    return {x,y};
+std::pair<int, int> Game::convertPixelsToCoordinates(int xp, int yp, bool enableCorrections) {
+    if (enableCorrections) {
+        return {(xp - correctionX) / 50, yp / 50};
+    }
+    return {xp / 50, yp / 50};
+}
+
+void Game::moveWorld() {
+    for (int i = 0; i < ROWS_OF_BLOCKS; i++) {
+        for (int j = 0; j < COLUMNS_OF_BLOCKS; j++) {
+            blocks[i][j].move(worldDx);
+        }
+    }
+
+    correctionX += worldDx;
 }

@@ -36,3 +36,10 @@ void Block::setDestroyed(bool destr) {
 
     destroyed = destr;
 }
+
+void Block::move(int dx) {
+    int x = rect.x() + dx;
+    int y = rect.top();
+
+    rect.moveTo(x, y);
+}
