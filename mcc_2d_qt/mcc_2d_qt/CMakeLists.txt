@@ -17,6 +17,8 @@ add_executable(mcc_2d_qt
   game.h game.cpp
   block.h block.cpp
   human.h human.cpp
+  cell.h cell.cpp
+  inventory.h inventory.cpp
 )
 target_link_libraries(mcc_2d_qt Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Widgets)
 

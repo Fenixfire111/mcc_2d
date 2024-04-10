@@ -29,6 +29,6 @@ private:
     int dx;
     int dy;
     static const int INITIAL_X = 500;
-    static const int INITIAL_Y = 500;
+    static const int INITIAL_Y = 400;
 
 };

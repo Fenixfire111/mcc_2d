@@ -7,7 +7,7 @@ Human::Human() {
     jump = 0;
     stand = true;
 
-    image.load("human9.png");
+    image.load("images/human.png");
 
     rect = image.rect();
     resetState();

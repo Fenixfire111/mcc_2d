@@ -3,22 +3,42 @@
 #include <QImage>
 #include <QRect>
 
+enum class BlockType {
+    EMPTY,
+    GRASS_BLOCK,
+    DIRT,
+    STONE,
+    BEDROCK,
+    COBBLESTONE,
+    TREE
+};
+
 class Block {
 
+private:
+    BlockType type;
+    QImage image;
+    QRect rect;
+    bool destroyed;
+    static const int SIZE = 50;
+
 public:
-    Block(int, int);
+    Block();
+    Block(int, int, BlockType);
     ~Block();
 
 public:
     bool isDestroyed();
-    void setDestroyed(bool);
     QRect getRect();
-    void setRect(QRect);
     QImage & getImage();
-    void move(int);
+    BlockType getType();
+    void setDestroyed(bool);
+    void setRect(QRect);
+    void setType(BlockType);
+    void move(int,int);
+    static int getSize() {
+        return SIZE;
+    };
 
-private:
-    QImage image;
-    QRect rect;
-    bool destroyed;
+
 };
